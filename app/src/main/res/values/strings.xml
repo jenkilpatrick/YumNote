@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">YumNote</string>
+    <string name="action_settings">Settings</string>
+
+    <string-array name="days_of_week">
+        <item>Saturday</item>
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+    </string-array>
+
+    <string-array name="meal_names">
+        <item>Breakfast</item>
+        <item>Lunch</item>
+        <item>Dinner</item>
+    </string-array>
+    <string name="title_activity_choose_meal">ChooseMealActivity</string>
+
+</resources>
