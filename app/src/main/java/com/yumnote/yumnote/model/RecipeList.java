@@ -50,7 +50,7 @@ public class RecipeList {
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
+                Log.e(TAG, "The read failed: " + firebaseError.getMessage());
             }
         });
     }
@@ -63,6 +63,8 @@ public class RecipeList {
         Firebase newRecipeRef = recipeRef.push();
         newRecipeRef.setValue(recipe);
         recipe.setId(newRecipeRef.getKey());
+
+        // TODO: Local add not needed since comes through as event?
         recipeList.add(recipe);
         notifyListeners();
     }

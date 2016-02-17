@@ -1,19 +1,24 @@
-package com.yumnote.yumnote;
+package com.yumnote.yumnote.planner;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.firebase.client.Firebase;
+import com.yumnote.yumnote.choose.ChooseRecipeActivity;
+import com.yumnote.yumnote.R;
 
-public class MenuPlannerActivity extends AppCompatActivity {
+import java.util.Date;
+
+public class PlannerActivity extends AppCompatActivity
+        implements PlannerAdapter.MenuPlannerListener {
+    public static final String RECIPE_ID = "recipeId";
+
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -29,15 +34,6 @@ public class MenuPlannerActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         mRecyclerView = (RecyclerView) findViewById(R.id.card_recycler_view);
 
         // use this setting to improve performance if you know that changes
@@ -49,7 +45,7 @@ public class MenuPlannerActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new MenuPlannerAdapter(this);
+        mAdapter = new PlannerAdapter(this, this);
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -73,5 +69,12 @@ public class MenuPlannerActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onAddRecipeToDate(Date date) {
+        Intent intent = new Intent(this, ChooseRecipeActivity.class);
+        // Start for result to return chosen value.
+        startActivity(intent);
     }
 }

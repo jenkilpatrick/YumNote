@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MenuPlannerActivity"
+            android:name=".planner.PlannerActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
@@ -21,13 +21,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ChooseMealActivity"
+            android:name=".choose.ChooseRecipeActivity"
             android:label="@string/title_activity_choose_meal"
-            android:parentActivityName=".MenuPlannerActivity"
+            android:parentActivityName=".planner.PlannerActivity"
             android:theme="@style/AppTheme.NoActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.yumnote.yumnote.MenuPlannerActivity" />
+                android:value=".planner.PlannerActivity" />
         </activity>
     </application>
 

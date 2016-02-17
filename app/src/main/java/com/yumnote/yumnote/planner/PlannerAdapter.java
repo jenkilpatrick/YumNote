@@ -1,9 +1,8 @@
-package com.yumnote.yumnote;
+package com.yumnote.yumnote.planner;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,17 +11,20 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.yumnote.yumnote.model.Ingredient;
+import com.yumnote.yumnote.R;
 import com.yumnote.yumnote.model.Recipe;
 import com.yumnote.yumnote.model.RecipeList;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
 /**
  * Created by jen on 2/15/16.
  */
-public class MenuPlannerAdapter extends RecyclerView.Adapter<MenuPlannerAdapter.ViewHolder> {
+public class PlannerAdapter extends RecyclerView.Adapter<PlannerAdapter.ViewHolder> {
+    public interface MenuPlannerListener {
+        void onAddRecipeToDate(Date date);
+    }
+
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
@@ -59,7 +61,7 @@ public class MenuPlannerAdapter extends RecyclerView.Adapter<MenuPlannerAdapter.
             removeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("MenuPlannerAdapter", "I was clicked! " + recipeName);
+                    Log.d("PlannerAdapter", "I was clicked! " + recipeName);
                 }
             });
 
@@ -67,12 +69,15 @@ public class MenuPlannerAdapter extends RecyclerView.Adapter<MenuPlannerAdapter.
         }
     }
 
+
     private final Context context;
+    private final MenuPlannerListener menuPlannerListener;
     private final String[] dayNameArray;
     private final RecipeList[] recipeListArray;
 
-    public MenuPlannerAdapter(Context context) {
+    public PlannerAdapter(Context context, MenuPlannerListener menuPlannerListener) {
         this.context = context;
+        this.menuPlannerListener = menuPlannerListener;
         this.dayNameArray = context.getResources().getStringArray(R.array.days_of_week);
         this.recipeListArray = new RecipeList[dayNameArray.length];
         for (int i = 0; i < recipeListArray.length; i++) {
@@ -88,7 +93,7 @@ public class MenuPlannerAdapter extends RecyclerView.Adapter<MenuPlannerAdapter.
 
     // Create new views (invoked by the layout manager)
     @Override
-    public MenuPlannerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public PlannerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         CardView v = (CardView) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.menu_planner_card, parent, false);
         ViewHolder vh = new ViewHolder(v);
@@ -108,9 +113,11 @@ public class MenuPlannerAdapter extends RecyclerView.Adapter<MenuPlannerAdapter.
         addRecipeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Recipe recipe = new Recipe(
-                        "Pork Ragu 2", 4, 6, new ArrayList<Ingredient>(), new ArrayList<String>());
-                recipeListArray[position].addNewRecipe(recipe);
+//                Recipe recipe = new Recipe(
+//                        "Pork Ragu 2", 4, 6, new ArrayList<Ingredient>(), new ArrayList<String>());
+//                recipeListArray[position].addNewRecipe(recipe);
+                // TODO: Update to use correct date.
+                menuPlannerListener.onAddRecipeToDate(new Date());
             }
         });
     }
