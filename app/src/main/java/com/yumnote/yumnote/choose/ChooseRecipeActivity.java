@@ -10,12 +10,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 
 import com.firebase.client.Firebase;
 import com.yumnote.yumnote.R;
 import com.yumnote.yumnote.model.Recipe;
 import com.yumnote.yumnote.planner.PlannerActivity;
-import com.yumnote.yumnote.planner.PlannerAdapter;
 
 public class ChooseRecipeActivity extends AppCompatActivity
         implements ChooseRecipeAdapter.RecipeSelectionListener{
@@ -25,19 +25,16 @@ public class ChooseRecipeActivity extends AppCompatActivity
     private RecyclerView.Adapter adapter;
 
     private String selectedRecipeId;
+    private String selectedRecipeTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // TODO: Move this to Application class, or ensure called in every activity.
-        Firebase.setAndroidContext(this);
-
         setContentView(R.layout.activity_choose_recipe);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // TODO: Change FAB icon to "add" symbol
         // TODO: Allow user to create new meals
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -48,6 +45,21 @@ public class ChooseRecipeActivity extends AppCompatActivity
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        findViewById(R.id.button_select).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.putExtra(PlannerActivity.EXTRA_RECIPE_KEY, selectedRecipeId);
+                intent.putExtra(PlannerActivity.EXTRA_RECIPE_TITLE, selectedRecipeTitle);
+
+                // TODO: Add ability to select number of servings
+                intent.putExtra(PlannerActivity.EXTRA_RECIPE_NUM_SERVINGS, 3);
+
+                setResult(Activity.RESULT_OK, intent);
+                finish();
+            }
+        });
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(false);
@@ -62,21 +74,21 @@ public class ChooseRecipeActivity extends AppCompatActivity
 
     @Override
     public void onRecipeSelected(Recipe recipe) {
-        // TODO: Show a select button
+        selectedRecipeId = recipe.getKey();
+        selectedRecipeTitle = recipe.getName();
+
         ((FloatingActionButton) findViewById(R.id.fab)).hide();
+        // TODO: Animate button in
+        findViewById(R.id.button_select).setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onSelectionRemoved() {
-        // TODO: Hide select button
-        ((FloatingActionButton) findViewById(R.id.fab)).show();
-    }
+        selectedRecipeId = null;
+        selectedRecipeTitle = null;
 
-    // TODO: Call this method when select button is tapped.
-    private void finishActivity() {
-        Intent intent = new Intent();
-        intent.putExtra(PlannerActivity.RECIPE_ID, selectedRecipeId);
-        setResult(Activity.RESULT_OK, intent);
-        finish();
+        // TODO: Animate button out
+        findViewById(R.id.button_select).setVisibility(View.GONE);
+        ((FloatingActionButton) findViewById(R.id.fab)).show();
     }
 }

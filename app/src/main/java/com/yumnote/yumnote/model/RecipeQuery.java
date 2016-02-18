@@ -13,23 +13,20 @@ import java.util.List;
 /**
  * Created by jen on 2/15/16.
  */
-public class RecipeList {
-    private static final String TAG = "RecipeList";
+public class RecipeQuery {
+    private static final String TAG = "RecipeQuery";
 
-    public static final String FIREBASE_ROOT_REF = "https://popping-heat-7515.firebaseio.com/";
-    public static final String RECIPE_REF = "recipe";
-
-    public interface RecipeListListener {
+    public interface RecipeChangeListener {
         void onRecipeUpdated();
     }
 
-    private final RecipeListListener recipeListListener;
+    private final RecipeChangeListener recipeChangeListener;
     private final List<Recipe> recipeList = new ArrayList<>();
     private final Firebase recipeRef;
 
-    public RecipeList(RecipeListListener recipeListListener) {
-        this.recipeListListener = recipeListListener;
-        recipeRef = new Firebase(FIREBASE_ROOT_REF + RECIPE_REF);
+    public RecipeQuery(RecipeChangeListener recipeChangeListener) {
+        this.recipeChangeListener = recipeChangeListener;
+        recipeRef = new Firebase(Store.FIREBASE_ROOT_REF + Store.RECIPE_REF);
         startQueryForDay();
     }
 
@@ -38,14 +35,15 @@ public class RecipeList {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Log.d(TAG, "There are " + snapshot.getChildrenCount() + " recipes");
+                recipeList.clear();
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
+                    // TODO: Key isn't getting set here
                     Recipe newRecipe = postSnapshot.getValue(Recipe.class);
-                    if (!recipeList.contains(newRecipe)) {
-                        recipeList.add(newRecipe);
-                        notifyListeners();
-                    }
+                    newRecipe.setKey(postSnapshot.getKey());
+                    recipeList.add(newRecipe);
                     Log.d(TAG, "Updated recipe:" + newRecipe.getName());
                 }
+                recipeChangeListener.onRecipeUpdated();
             }
 
             @Override
@@ -57,19 +55,5 @@ public class RecipeList {
 
     public List<Recipe> getRecipes() {
         return recipeList;
-    }
-
-    public void addNewRecipe(Recipe recipe) {
-        Firebase newRecipeRef = recipeRef.push();
-        newRecipeRef.setValue(recipe);
-        recipe.setId(newRecipeRef.getKey());
-
-        // TODO: Local add not needed since comes through as event?
-        recipeList.add(recipe);
-        notifyListeners();
-    }
-
-    private void notifyListeners() {
-        recipeListListener.onRecipeUpdated();
     }
 }

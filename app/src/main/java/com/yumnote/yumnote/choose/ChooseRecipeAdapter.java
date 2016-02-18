@@ -10,9 +10,7 @@ import android.widget.TextView;
 
 import com.yumnote.yumnote.R;
 import com.yumnote.yumnote.model.Recipe;
-import com.yumnote.yumnote.model.RecipeList;
-
-import java.util.Date;
+import com.yumnote.yumnote.model.RecipeQuery;
 
 /**
  * Created by jen on 2/15/16.
@@ -52,7 +50,7 @@ public class ChooseRecipeAdapter extends RecyclerView.Adapter<ChooseRecipeAdapte
                         selectedItem = getLayoutPosition();
                         notifyItemChanged(selectedItem);
                         recipeSelectionListener.onRecipeSelected(
-                                recipeList.getRecipes().get(getLayoutPosition()));
+                                recipeQuery.getRecipes().get(getLayoutPosition()));
                     }
                 }
             });
@@ -65,13 +63,13 @@ public class ChooseRecipeAdapter extends RecyclerView.Adapter<ChooseRecipeAdapte
     }
 
     private final RecipeSelectionListener recipeSelectionListener;
-    private final RecipeList recipeList;
+    private final RecipeQuery recipeQuery;
 
     private int selectedItem = -1;
 
     public ChooseRecipeAdapter(RecipeSelectionListener recipeSelectionListener) {
         this.recipeSelectionListener = recipeSelectionListener;
-        recipeList = new RecipeList(new RecipeList.RecipeListListener() {
+        recipeQuery = new RecipeQuery(new RecipeQuery.RecipeChangeListener() {
             @Override
             public void onRecipeUpdated() {
                 // TODO: Notify on particular item?
@@ -92,7 +90,7 @@ public class ChooseRecipeAdapter extends RecyclerView.Adapter<ChooseRecipeAdapte
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        holder.setRecipe(recipeList.getRecipes().get(position));
+        holder.setRecipe(recipeQuery.getRecipes().get(position));
         holder.cardView.setSelected(selectedItem == position);
 
         // TODO: Setting the selected color this way destroys the tap animation, and the gray is too
@@ -104,6 +102,6 @@ public class ChooseRecipeAdapter extends RecyclerView.Adapter<ChooseRecipeAdapte
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return recipeList.getRecipes().size();
+        return recipeQuery.getRecipes().size();
     }
 }

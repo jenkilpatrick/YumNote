@@ -9,41 +9,25 @@ import java.util.List;
  * Created by jen on 2/15/16.
  */
 public class Recipe {
-    public static final Recipe DEFAULT_RECIPE = new Recipe(
-            "Pork Ragu 2", 4, 6, new ArrayList<Ingredient>(), new ArrayList<String>());
-
-    @Nullable
+    private String key;
     private String name;
     private int minNumServed;
     private int maxNumServed;
-
-    @Nullable
     private List<Ingredient> ingredients;
-
-    @Nullable
     private List<String> instructions;
-
-    @Nullable
-    private String id;
 
     public Recipe() { // Default Constructor for JSON
     }
 
-    public Recipe(
-            String name,
-            int minNumServed,
-            int maxNumServed,
-            List<Ingredient> ingredients,
-            List<String> instructions) {
-        if (ingredients == null || instructions == null) {
-            throw new IllegalArgumentException("Null value when initializing Recipe");
-        }
+    /** Returns null if recipe not yet saved to the server. */
+    @Nullable
+    public String getKey() {
+        return key;
+    }
 
-        this.name = name;
-        this.minNumServed = minNumServed;
-        this.maxNumServed = maxNumServed;
-        this.ingredients = ingredients;
-        this.instructions = instructions;
+    /** Only accessible within this package. Should only be used by server code to update key. */
+    void setKey(String key) {
+        this.key = key;
     }
 
     public String getName() {
@@ -84,16 +68,5 @@ public class Recipe {
 
     public void setInstructions(List<String> instructions) {
         this.instructions = instructions;
-    }
-
-    /** Returns null if recipe not yet saved to the server. */
-    @Nullable
-    public String getId() {
-        return id;
-    }
-
-    /** Only accessible within this package. Should only be used by server code to update id. */
-    void setId(String id) {
-        this.id = id;
     }
 }
