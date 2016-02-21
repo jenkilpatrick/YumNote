@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
-        } else if (id == R.id.action_create) {
+        } else if (id == R.id.action_create_recipe) {
             Recipe recipe = new Recipe();
             recipe.setName("New recipe " + new Random().nextInt(10));
             recipe.setMinNumServed(2);
@@ -115,9 +115,6 @@ public class MainActivity extends AppCompatActivity
 
             new Store().createNewRecipe(recipe);
             return true;
-        } else if (id == R.id.action_shopping_list) {
-            Intent intent = new Intent(this, ShoppingFragment.class);
-            startActivity(intent);
         } else if (id == R.id.action_create_shopping_list) {
             Calendar c = Calendar.getInstance();
             c.clear(Calendar.HOUR);
