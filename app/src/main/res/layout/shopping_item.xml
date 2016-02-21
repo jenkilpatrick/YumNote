@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <!--<CheckedTextView xmlns:android="http://schemas.android.com/apk/raes/android"-->
+        <!--android:id="@+id/checked_text_view"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="?android:attr/listPreferredItemHeightSmall"-->
+        <!--android:textAppearance="?android:attr/textAppearanceListItemSmall"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:checkMark="?android:attr/textCheckMark"-->
+        <!--android:paddingStart="?android:attr/listPreferredItemPaddingStart"-->
+        <!--android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"-->
+        <!--tools:text="Checked Text View" />-->
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/checkbox"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="10dp"
+        />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/checkbox"
+        android:layout_centerVertical="true">
+    <TextView android:id="@android:id/text1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceListItem"
+        android:textAlignment="viewStart"
+
+        tools:text="Text View 1"
+        />
+
+    <TextView android:id="@android:id/text2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@android:id/text1"
+        android:layout_alignStart="@android:id/text1"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAlignment="viewStart"
+        tools:text="Text View 2"
+        />
+    </RelativeLayout>
+
+</RelativeLayout>

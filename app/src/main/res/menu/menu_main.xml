@@ -1,0 +1,25 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".planner.PlannerFragment">
+    <item
+        android:id="@+id/action_create"
+        android:orderInCategory="100"
+        android:title="@string/action_create"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_shopping_list"
+        android:orderInCategory="100"
+        android:title="@string/action_shopping_list"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_create_shopping_list"
+        android:orderInCategory="100"
+        android:title="@string/action_create_shopping_list"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+</menu>

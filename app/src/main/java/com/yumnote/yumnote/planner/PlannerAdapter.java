@@ -56,7 +56,10 @@ public class PlannerAdapter extends RecyclerView.Adapter<PlannerAdapter.ViewHold
                 View menuItem = LayoutInflater.from(mCardView.getContext())
                         .inflate(R.layout.menu_planner_item, linearLayout, false);
                 TextView menuItemTextView = (TextView) menuItem.findViewById(R.id.menu_item_name);
-                menuItemTextView.setText(plannedRecipe.getRecipeTitle());
+
+                // TODO: Instead of concatenating, move to string resource.
+                menuItemTextView.setText(
+                        plannedRecipe.getRecipeTitle() + " for " + plannedRecipe.getNumServings());
 
                 ImageButton removeButton =
                         (ImageButton) menuItem.findViewById(R.id.menu_item_remove);

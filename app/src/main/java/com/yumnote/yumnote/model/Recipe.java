@@ -3,7 +3,9 @@ package com.yumnote.yumnote.model;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jen on 2/15/16.
@@ -26,7 +28,7 @@ public class Recipe {
     }
 
     /** Only accessible within this package. Should only be used by server code to update key. */
-    void setKey(String key) {
+    public void setKey(String key) {
         this.key = key;
     }
 

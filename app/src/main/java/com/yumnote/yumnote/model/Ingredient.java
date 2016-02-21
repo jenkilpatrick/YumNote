@@ -7,11 +7,15 @@ public class Ingredient {
     // e.g., 2
     private int value;
 
+    // TODO: denormalize singular/plural
     // e.g., cups
     private String measure;
 
+    // TODO: denormalize singular/plural
     // e.g., flour
     private String item;
+
+    public Ingredient() { }
 
     public Ingredient(int value, String measure, String item) {
         this.value = value;
@@ -41,5 +45,10 @@ public class Ingredient {
 
     public String getItem() {
         return item;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s %s %s", value, measure, item);
     }
 }

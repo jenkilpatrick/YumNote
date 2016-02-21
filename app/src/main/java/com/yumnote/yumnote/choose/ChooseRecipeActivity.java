@@ -10,12 +10,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Button;
 
-import com.firebase.client.Firebase;
 import com.yumnote.yumnote.R;
 import com.yumnote.yumnote.model.Recipe;
-import com.yumnote.yumnote.planner.PlannerActivity;
+import com.yumnote.yumnote.planner.PlannerFragment;
 
 public class ChooseRecipeActivity extends AppCompatActivity
         implements ChooseRecipeAdapter.RecipeSelectionListener{
@@ -50,11 +48,11 @@ public class ChooseRecipeActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.putExtra(PlannerActivity.EXTRA_RECIPE_KEY, selectedRecipeId);
-                intent.putExtra(PlannerActivity.EXTRA_RECIPE_TITLE, selectedRecipeTitle);
+                intent.putExtra(PlannerFragment.EXTRA_RECIPE_KEY, selectedRecipeId);
+                intent.putExtra(PlannerFragment.EXTRA_RECIPE_TITLE, selectedRecipeTitle);
 
                 // TODO: Add ability to select number of servings
-                intent.putExtra(PlannerActivity.EXTRA_RECIPE_NUM_SERVINGS, 3);
+                intent.putExtra(PlannerFragment.EXTRA_RECIPE_NUM_SERVINGS, 3);
 
                 setResult(Activity.RESULT_OK, intent);
                 finish();

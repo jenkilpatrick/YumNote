@@ -1,0 +1,40 @@
+{
+  recipe: {
+    recipe1: {
+      name: "Pork Ragu",
+      minNumServed: 2,
+      maxNumServed: 4,
+      instructions: {
+        instruction1: "Do something",
+        instruction2: "Do something else"
+      },
+      note: "this is a string",
+      ingredients : {
+        ingredient1: true
+      }
+    },
+  },
+  plan: {
+    plan1: {
+      date: 1234,
+      recipes: {
+        recipe1: true
+      },
+    }
+  },
+  shoppinglist: {
+    name: "name of list",
+    startdate: 1234,
+    enddate: 2345,
+    ingredients: {
+      ingredient1: {
+        isChecked: true,
+        plannedRecipe: plan1
+      },
+      ingredient2: {
+
+      }
+    }
+
+  }
+}
