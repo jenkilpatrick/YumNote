@@ -2,9 +2,13 @@ package com.yumnote.yumnote.model;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.MutableData;
 import com.firebase.client.Query;
-
-import java.util.Date;
+import com.firebase.client.Transaction;
+import com.firebase.client.Transaction.Handler;
+import com.firebase.client.Transaction.Result;
+import com.yumnote.yumnote.model.ShoppingList.ShoppingListIngredient;
 
 /**
  * Created by jen on 2/17/16.
@@ -47,11 +51,13 @@ public class Store {
         final Firebase rootRef = new Firebase(FIREBASE_ROOT_REF);
 
         // Create new shopping list item
-        ShoppingList shoppingList = new ShoppingList();
+        final ShoppingList shoppingList = new ShoppingList();
         shoppingList.setStartDate(startDate);
         shoppingList.setEndDate(endDate);
-        final Firebase newRef = rootRef.child(SHOPPING_LIST_REF).push();
+
+        Firebase newRef = rootRef.child(SHOPPING_LIST_REF).push();
         newRef.setValue(shoppingList);
+        shoppingList.setKey(newRef.getKey());
 
         // Look up all relevant ingredients and create shopping list ingredients.
         Query plannedRecipeQueryRef = rootRef.child(PLANNED_RECIPE_REF).orderByChild("planDateMillis")
@@ -59,29 +65,56 @@ public class Store {
         plannedRecipeQueryRef.addListenerForSingleValueEvent(new DefaultValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot plannedRecipeSnapshot : dataSnapshot.getChildren()) {
-                    final PlannedRecipe plannedRecipe =
-                            plannedRecipeSnapshot.getValue(PlannedRecipe.class);
-                    final String plannedRecipeKey = plannedRecipeSnapshot.getKey();
-                    rootRef.child(RECIPE_REF).child(plannedRecipe.getRecipeKey())
-                            .addListenerForSingleValueEvent(new DefaultValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot recipeSnapshot) {
-                                    Recipe recipe = recipeSnapshot.getValue(Recipe.class);
-                                    if (recipe.getIngredients() != null) {
-                                        for (Ingredient ingredient : recipe.getIngredients()) {
-                                            Firebase ingredientRef =
-                                                    newRef.child("ingredients").push();
-                                            ingredientRef.setValue(
-                                                    new ShoppingList.ShoppingListIngredient(
-                                                            ingredient, false, plannedRecipeKey));
-
-                                        }
-                                    }
-                                }
-                            });
+                for (DataSnapshot prSnapshot : dataSnapshot.getChildren()) {
+                    PlannedRecipe plannedRecipe = prSnapshot.getValue(PlannedRecipe.class);
+                    String plannedRecipeKey = prSnapshot.getKey();
+                    addIngredientsToShoppingList(
+                            shoppingList.getKey(), plannedRecipe.getRecipeKey(), plannedRecipeKey,
+                            plannedRecipe.getRecipeTitle());
                 }
             }
         });
+    }
+
+    private void addIngredientsToShoppingList(String shoppingListKey, String recipeKey,
+            final String plannedRecipeKey, final String plannedRecipeTitle) {
+        Firebase rootRef = new Firebase(FIREBASE_ROOT_REF);
+        Firebase recipeRef = rootRef.child(RECIPE_REF).child(recipeKey);
+        final Firebase shoppingListRef = rootRef.child(SHOPPING_LIST_REF).child(shoppingListKey);
+
+        recipeRef.addListenerForSingleValueEvent(new DefaultValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot recipeSnapshot) {
+                        Recipe recipe = recipeSnapshot.getValue(Recipe.class);
+                        if (recipe.getIngredients() != null) {
+                            for (final Ingredient ingredient : recipe.getIngredients()) {
+                                shoppingListRef.runTransaction(new Handler() {
+                                    @Override
+                                    public Result doTransaction(MutableData currentData) {
+                                        ShoppingList shoppingList =
+                                                currentData.getValue(ShoppingList.class);
+                                        shoppingList.addIngredient(new ShoppingListIngredient(
+                                                ingredient, false, plannedRecipeKey,
+                                                plannedRecipeTitle));
+                                        currentData.setValue(shoppingList);
+                                        return Transaction.success(currentData);
+                                    }
+
+                                    @Override
+                                    public void onComplete(FirebaseError firebaseError, boolean b,
+                                                           DataSnapshot dataSnapshot) {
+                                        // Ignore
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+    }
+
+    public void removeShoppingList(ShoppingList shoppingList) {
+        Firebase ref = new Firebase(FIREBASE_ROOT_REF).child(SHOPPING_LIST_REF)
+                .child(shoppingList.getKey());
+        ref.removeValue();
     }
 }

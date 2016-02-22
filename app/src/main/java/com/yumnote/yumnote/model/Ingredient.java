@@ -1,5 +1,7 @@
 package com.yumnote.yumnote.model;
 
+import java.util.Objects;
+
 /**
  * Created by jen on 2/15/16.
  */
@@ -45,6 +47,15 @@ public class Ingredient {
 
     public String getItem() {
         return item;
+    }
+
+    public boolean canAdd(Ingredient other) {
+        return Objects.equals(item, other.getItem()) && Objects.equals(measure, other.getMeasure());
+    }
+
+    public void add(Ingredient other) {
+        assert canAdd(other);
+        this.value = this.value + other.getValue();
     }
 
     @Override

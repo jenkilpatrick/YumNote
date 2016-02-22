@@ -8,11 +8,6 @@
         android:title="@string/action_create_recipe"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_create_shopping_list"
-        android:orderInCategory="100"
-        android:title="@string/action_create_shopping_list"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"

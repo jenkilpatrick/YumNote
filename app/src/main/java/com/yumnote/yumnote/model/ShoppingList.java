@@ -1,6 +1,10 @@
 package com.yumnote.yumnote.model;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -8,27 +12,52 @@ import java.util.Map;
  */
 public class ShoppingList {
     public static class ShoppingListIngredient {
+        public static class PlannedRecipeInfo {
+            private String key;
+            private String title;
+
+            PlannedRecipeInfo() { } // For JSON
+
+            PlannedRecipeInfo(String key, String title) {
+                this.key = key;
+                this.title = title;
+            }
+
+            public String getKey() {
+                return key;
+            }
+
+            public void setKey(String key) {
+                this.key = key;
+            }
+
+            public String getTitle() {
+                return title;
+            }
+
+            public void setTitle(String title) {
+                this.title = title;
+            }
+        }
+
         private Ingredient ingredient;
         private boolean purchased;
-        private String plannedRecipeKey;
+        private List<PlannedRecipeInfo> plannedRecipeInfoList = new ArrayList<>();
 
         ShoppingListIngredient() { } // Default constructor for JSON
 
         ShoppingListIngredient(
                 Ingredient ingredient,
                 boolean purchased,
-                String plannedRecipeKey) {
+                String plannedRecipeKey,
+                String plannedRecipeTitle) {
             this.ingredient = ingredient;
             this.purchased = purchased;
-            this.plannedRecipeKey = plannedRecipeKey;
+            plannedRecipeInfoList.add(new PlannedRecipeInfo(plannedRecipeKey, plannedRecipeTitle));
         }
 
         public Ingredient getIngredient() {
             return ingredient;
-        }
-
-        public void setIngredient(Ingredient ingredient) {
-            this.ingredient = ingredient;
         }
 
         public boolean getPurchased() {
@@ -39,20 +68,32 @@ public class ShoppingList {
             this.purchased = purchased;
         }
 
-        public String getPlannedRecipeKey() {
-            return plannedRecipeKey;
+        public List<PlannedRecipeInfo> getPlannedRecipeInfoList() {
+            return plannedRecipeInfoList;
         }
 
-        public void setPlannedRecipeKey(String plannedRecipeKey) {
-            this.plannedRecipeKey = plannedRecipeKey;
+        public void setPlannedRecipeInfoList(List<PlannedRecipeInfo> plannedRecipeInfoList) {
+            this.plannedRecipeInfoList = plannedRecipeInfoList;
+        }
+
+        public boolean canAdd(ShoppingListIngredient other) {
+            return ingredient.canAdd(other.getIngredient());
+        }
+
+        public void add(ShoppingListIngredient other) {
+            ingredient.add(other.getIngredient());
+            plannedRecipeInfoList.addAll(other.getPlannedRecipeInfoList());
         }
     }
 
     private long startDateMillis;
     private long endDateMillis;
-    private Map<String, ShoppingListIngredient> ingredients;
+    private List<ShoppingListIngredient> ingredients;
+    private Map<String, ShoppingListIngredient> itemIngredientMap;
+    private String key;
 
     public ShoppingList() { // Default Constructor for JSON
+        this.ingredients = new ArrayList<>();
     }
 
     public long getStartDateMillis() {
@@ -71,12 +112,44 @@ public class ShoppingList {
         this.endDateMillis = endDate.getMillis();
     }
 
-    public Map<String, ShoppingListIngredient> getIngredients() {
+    public List<ShoppingListIngredient> getIngredients() {
         return ingredients;
     }
 
-    public void setIngredients(Map<String, ShoppingListIngredient> ingredients) {
-        this.ingredients = ingredients;
+    public void addIngredient(ShoppingListIngredient newIngredient) {
+        if (itemIngredientMap == null) {
+            itemIngredientMap = new HashMap<>();
+            for (ShoppingListIngredient ingredient : ingredients) {
+                itemIngredientMap.put(ingredient.getIngredient().getItem(), ingredient);
+            }
+        }
+
+        String item = newIngredient.getIngredient().getItem();
+        ShoppingListIngredient existingIngredient = itemIngredientMap.get(item);
+        if (existingIngredient != null && existingIngredient.canAdd(newIngredient)) {
+            existingIngredient.add(newIngredient);
+        } else {
+            ingredients.add(newIngredient);
+            itemIngredientMap.put(item, newIngredient);
+            sortIngredients();
+        }
+    }
+
+    private void sortIngredients() {
+        Collections.sort(ingredients, new Comparator<ShoppingListIngredient>() {
+            @Override
+            public int compare(ShoppingListIngredient lhs, ShoppingListIngredient rhs) {
+                return lhs.getIngredient().getItem().compareTo(rhs.getIngredient().getItem());
+            }
+        });
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     @Override

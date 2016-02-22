@@ -9,31 +9,22 @@
     card_view:cardCornerRadius="4dp"
     android:layout_margin="5dp">
 
-    <LinearLayout
-        android:id="@+id/card_linear_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:orientation="vertical"
-        >
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
+            android:layout_margin="16dp">
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/card_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_clear_black_24dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_add_circle_black_48dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:paddingLeft="2dp"
                 android:paddingRight="2dp"
-                android:layout_centerVertical="true"
-                android:tint="?android:attr/textColorHint"
+                android:paddingBottom="16dp"
+                android:layout_centerHorizontal="true"
+                android:tint="?android:attr/colorAccent"
                 />
 
             <TextView
@@ -41,14 +32,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
-                android:layout_toStartOf="@id/card_button"
-                tools:text="Shopping list title"
+                android:layout_below="@id/card_button"
+                android:layout_centerHorizontal="true"
+                android:textAlignment="center"
+                android:text="Create a shopping list"
                 />
 
         </RelativeLayout>
-
-    </LinearLayout>
 
 </android.support.v7.widget.CardView>
