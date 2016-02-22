@@ -24,7 +24,7 @@ public class Store {
     }
 
     public void addRecipeToPlan(
-            Date planDate, String recipeKey, String recipeTitle, int recipeNumServings) {
+            PlanDate planDate, String recipeKey, String recipeTitle, int recipeNumServings) {
         PlannedRecipe plannedRecipe = new PlannedRecipe();
         plannedRecipe.setPlanDate(planDate);
         plannedRecipe.setRecipeKey(recipeKey);
@@ -43,7 +43,7 @@ public class Store {
         plannedRecipeRef.removeValue();
     }
 
-    public void createShoppingList(Date startDate, Date endDate) {
+    public void createShoppingList(PlanDate startDate, PlanDate endDate) {
         final Firebase rootRef = new Firebase(FIREBASE_ROOT_REF);
 
         // Create new shopping list item
@@ -54,8 +54,8 @@ public class Store {
         newRef.setValue(shoppingList);
 
         // Look up all relevant ingredients and create shopping list ingredients.
-        Query plannedRecipeQueryRef = rootRef.child(PLANNED_RECIPE_REF).orderByChild("planDate")
-                .startAt(startDate.getTime()).endAt(endDate.getTime());
+        Query plannedRecipeQueryRef = rootRef.child(PLANNED_RECIPE_REF).orderByChild("planDateMillis")
+                .startAt(startDate.getMillis()).endAt(endDate.getMillis());
         plannedRecipeQueryRef.addListenerForSingleValueEvent(new DefaultValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

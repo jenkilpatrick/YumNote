@@ -17,6 +17,7 @@ import android.view.MenuItem;
 
 import com.yumnote.yumnote.choose.ChooseRecipeActivity;
 import com.yumnote.yumnote.model.Ingredient;
+import com.yumnote.yumnote.model.PlanDate;
 import com.yumnote.yumnote.model.Recipe;
 import com.yumnote.yumnote.model.Store;
 import com.yumnote.yumnote.planner.PlannerAdapter;
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final int REQUEST_CODE_CHOOSE_RECIPE = 0;
 
-    private Date addRecipeDate;
+    private PlanDate addRecipeDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,14 +117,8 @@ public class MainActivity extends AppCompatActivity
             new Store().createNewRecipe(recipe);
             return true;
         } else if (id == R.id.action_create_shopping_list) {
-            Calendar c = Calendar.getInstance();
-            c.clear(Calendar.HOUR);
-            c.clear(Calendar.MINUTE);
-            c.clear(Calendar.SECOND);
-            c.clear(Calendar.MILLISECOND);
-            Date startDate = c.getTime();
-            c.add(Calendar.DATE, 4);
-            Date endDate = c.getTime();
+            PlanDate startDate = new PlanDate();
+            PlanDate endDate = new PlanDate().addDays(4);
             new Store().createShoppingList(startDate, endDate);
         }
 
@@ -153,7 +148,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onAddRecipeToDate(Date date) {
+    public void onAddRecipeToDate(PlanDate date) {
         addRecipeDate = date;
         Intent intent = new Intent(this, ChooseRecipeActivity.class);
         startActivityForResult(intent, REQUEST_CODE_CHOOSE_RECIPE);

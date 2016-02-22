@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class PlannedRecipe {
     private String key;
-    private Date planDate;
+    private long planDateMillis;
     private String recipeKey;
     private String recipeTitle;
     private int numServings;
@@ -29,12 +29,12 @@ public class PlannedRecipe {
         this.key = key;
     }
 
-    public Date getPlanDate() {
-        return planDate;
+    public long getPlanDateMillis() {
+        return planDateMillis;
     }
 
-    public void setPlanDate(Date planDate) {
-        this.planDate = planDate;
+    public void setPlanDate(PlanDate planDate) {
+        this.planDateMillis = planDate.getMillis();
     }
 
     public String getRecipeKey() {

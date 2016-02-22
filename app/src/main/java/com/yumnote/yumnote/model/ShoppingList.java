@@ -48,27 +48,27 @@ public class ShoppingList {
         }
     }
 
-    private Date startDate;
-    private Date endDate;
+    private long startDateMillis;
+    private long endDateMillis;
     private Map<String, ShoppingListIngredient> ingredients;
 
     public ShoppingList() { // Default Constructor for JSON
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setStartDate(PlanDate startDate) {
+        this.startDateMillis = startDate.getMillis();
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setEndDate(PlanDate endDate) {
+        this.endDateMillis = endDate.getMillis();
     }
 
     public Map<String, ShoppingListIngredient> getIngredients() {
@@ -81,6 +81,6 @@ public class ShoppingList {
 
     @Override
     public String toString() {
-        return "ShoppingList: " + getStartDate();
+        return "ShoppingList: " + getStartDateMillis();
     }
 }

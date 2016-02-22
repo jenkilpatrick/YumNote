@@ -36,7 +36,7 @@ public class ShoppingAdapter extends RecyclerView.Adapter<ShoppingAdapter.ViewHo
         public void setShoppingList(ShoppingList shoppingList) {
             // TODO: Fix date formatting.
             ((TextView) cardView.findViewById(R.id.card_title)).setText(
-                    "List from " + shoppingList.getStartDate() + " to " + shoppingList.getEndDate());
+                    "List from " + shoppingList.getStartDateMillis() + " to " + shoppingList.getEndDateMillis());
             LinearLayout linearLayout =
                     (LinearLayout) cardView.findViewById(R.id.card_linear_layout);
             linearLayout.removeViews(1, linearLayout.getChildCount() - 1);
@@ -80,6 +80,7 @@ public class ShoppingAdapter extends RecyclerView.Adapter<ShoppingAdapter.ViewHo
         ref.addValueEventListener(new DefaultValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                shoppingLists.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     ShoppingList shoppingList = snapshot.getValue(ShoppingList.class);
                     shoppingLists.add(shoppingList);

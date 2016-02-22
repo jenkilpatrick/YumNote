@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.yumnote.yumnote.R;
+import com.yumnote.yumnote.model.PlanDate;
 import com.yumnote.yumnote.model.PlanQuery;
 import com.yumnote.yumnote.model.PlannedRecipe;
 import com.yumnote.yumnote.model.Recipe;
@@ -24,16 +25,14 @@ import java.util.Date;
  * Created by jen on 2/15/16.
  */
 public class PlannerAdapter extends RecyclerView.Adapter<PlannerAdapter.ViewHolder> {
+    private static final String TAG = "PlannerAdapter";
+
     public interface MenuPlannerListener {
-        void onAddRecipeToDate(Date date);
+        void onAddRecipeToDate(PlanDate date);
         void onRemoveRecipeFromDate(String plannedRecipeKey);
     }
 
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
         private CardView mCardView;
 
         public ViewHolder(CardView v) {
@@ -77,7 +76,7 @@ public class PlannerAdapter extends RecyclerView.Adapter<PlannerAdapter.ViewHold
 
     private final Context context;
     private final MenuPlannerListener menuPlannerListener;
-    private final Date[] dateArray;
+    private final PlanDate[] dateArray;
     private final PlanQuery[] planQueryArray;
 
     private static final int N_DAYS_TO_SHOW = 3;
@@ -85,19 +84,10 @@ public class PlannerAdapter extends RecyclerView.Adapter<PlannerAdapter.ViewHold
     public PlannerAdapter(Context context, MenuPlannerListener menuPlannerListener) {
         this.context = context;
         this.menuPlannerListener = menuPlannerListener;
-        this.dateArray = new Date[N_DAYS_TO_SHOW];
-
-        // TODO: This is error-prone. Use custom object to hold day/month/year since that's all I
-        // want.
-        Calendar calendar = Calendar.getInstance();
-        calendar.clear(Calendar.HOUR);
-        calendar.clear(Calendar.MINUTE);
-        calendar.clear(Calendar.SECOND);
-        calendar.clear(Calendar.MILLISECOND);
+        this.dateArray = new PlanDate[N_DAYS_TO_SHOW];
 
         for (int i = 0; i < dateArray.length; i++) {
-            dateArray[i] = calendar.getTime();
-            calendar.add(Calendar.DATE, 1);
+            dateArray[i] = new PlanDate().addDays(i);
         }
 
         this.planQueryArray = new PlanQuery[dateArray.length];
@@ -112,7 +102,6 @@ public class PlannerAdapter extends RecyclerView.Adapter<PlannerAdapter.ViewHold
         }
     }
 
-    // Create new views (invoked by the layout manager)
     @Override
     public PlannerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         CardView v = (CardView) LayoutInflater.from(parent.getContext())
@@ -121,14 +110,28 @@ public class PlannerAdapter extends RecyclerView.Adapter<PlannerAdapter.ViewHold
         return vh;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
+        holder.setDayName(getDayNameForPosition(position));
+        holder.setRecipes(planQueryArray[position], menuPlannerListener);
 
+        // TODO: Move into holder
+        // TODO: Unregister when view is recycled
+        ImageButton addRecipeButton =
+                (ImageButton) holder.mCardView.findViewById(R.id.card_add_recipe);
+        addRecipeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menuPlannerListener.onAddRecipeToDate(dateArray[position]);
+            }
+        });
+    }
+
+    // TODO: So ugly. Fix to make more elegant.
+    private String getDayNameForPosition(int position) {
         Calendar c = Calendar.getInstance();
-        c.setTime(dateArray[position]);
+        c.setTimeInMillis(dateArray[position].getMillis());
 
-        // UGH. Ugly. Change this to a for loop or move somewhere else.
         int dayIndex = 0;
         switch(c.get(Calendar.DAY_OF_WEEK)) {
             case Calendar.SUNDAY:
@@ -153,25 +156,9 @@ public class PlannerAdapter extends RecyclerView.Adapter<PlannerAdapter.ViewHold
                 dayIndex = 6;
                 break;
         }
-        String dayName = context.getResources().getStringArray(R.array.days_of_week)[dayIndex];
-
-        holder.setDayName(dayName);
-        holder.setRecipes(planQueryArray[position], menuPlannerListener);
-
-        // TODO: Move into holder
-        // TODO: Unregister when view is recycled
-        ImageButton addRecipeButton =
-                (ImageButton) holder.mCardView.findViewById(R.id.card_add_recipe);
-        addRecipeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO: Update to use correct date.
-                menuPlannerListener.onAddRecipeToDate(dateArray[position]);
-            }
-        });
+        return context.getResources().getStringArray(R.array.days_of_week)[dayIndex];
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return dateArray.length;

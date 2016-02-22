@@ -17,7 +17,7 @@ import java.util.List;
  * Created by jen on 2/15/16.
  */
 public class PlanQuery {
-    private static final String TAG = "RecipeQuery";
+    private static final String TAG = "PlanQuery";
 
     public interface RecipeChangeListener {
         void onRecipeUpdated();
@@ -25,15 +25,11 @@ public class PlanQuery {
 
     private final List<PlannedRecipe> plannedRecipeList = new ArrayList<>();
 
-    private final Date planDate;
-
-    public PlanQuery(Date planDate, final RecipeChangeListener recipeChangeListener) {
-        this.planDate = planDate;
-
+    public PlanQuery(PlanDate planDate, final RecipeChangeListener recipeChangeListener) {
         Firebase ref = new Firebase(Store.FIREBASE_ROOT_REF + Store.PLANNED_RECIPE_REF);
 
-        Log.e(TAG, "Plan date: " + planDate.getTime());
-        Query queryRef = ref.orderByChild("planDate").equalTo(planDate.getTime());
+        Log.e(TAG, "Plan date: " + planDate.getMillis());
+        Query queryRef = ref.orderByChild("planDateMillis").equalTo(planDate.getMillis());
         queryRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -53,10 +49,6 @@ public class PlanQuery {
                 Log.e(TAG, "The read failed: " + firebaseError.getMessage());
             }
         });
-    }
-
-    public Date getPlanDate() {
-        return planDate;
     }
 
     public List<PlannedRecipe> getPlannedRecipes() {
