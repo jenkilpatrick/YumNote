@@ -69,7 +69,11 @@ public class ShoppingAdapter extends RecyclerView.Adapter<ShoppingAdapter.ViewHo
 
             // Add all the ingredients.
             if (shoppingList.getIngredients() != null) {
-                for (ShoppingListIngredient ingredient : shoppingList.getIngredients()) {
+                int ingredientsSize = shoppingList.getIngredients().size();
+                for (int i = 0; i < ingredientsSize; i++) {
+                    final int position = i;
+                    ShoppingListIngredient ingredient = shoppingList.getIngredients().get(i);
+
                     View listItem = LayoutInflater.from(cardView.getContext())
                             .inflate(R.layout.shopping_item, listLayout, false);
 
@@ -80,6 +84,8 @@ public class ShoppingAdapter extends RecyclerView.Adapter<ShoppingAdapter.ViewHo
                         @Override
                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                             // TODO: Update the shopping list to set the item as checked.
+                            new Store().setShoppingListIngredientState(
+                                    shoppingList, position, isChecked);
                         }
                     });
 

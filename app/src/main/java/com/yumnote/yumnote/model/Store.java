@@ -117,4 +117,14 @@ public class Store {
                 .child(shoppingList.getKey());
         ref.removeValue();
     }
+
+    public void setShoppingListIngredientState(
+            ShoppingList shoppingList, int position, boolean purchased) {
+        Firebase ref = new Firebase(FIREBASE_ROOT_REF).child(SHOPPING_LIST_REF)
+                .child(shoppingList.getKey())
+                .child("ingredients")
+                .child(String.valueOf(position))
+                .child("purchased");
+        ref.setValue(purchased);
+    }
 }
