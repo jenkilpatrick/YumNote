@@ -1,5 +1,7 @@
 package com.yumnote.yumnote.model;
 
+import android.util.Log;
+
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -60,8 +62,14 @@ public class Store {
         shoppingList.setKey(newRef.getKey());
 
         // Look up all relevant ingredients and create shopping list ingredients.
-        Query plannedRecipeQueryRef = rootRef.child(PLANNED_RECIPE_REF).orderByChild("planDateMillis")
-                .startAt(startDate.getMillis()).endAt(endDate.getMillis());
+        Log.e("Store", "Start millis: " + startDate.getMillis() + " " + "End millis: "
+                + endDate.getMillis());
+
+        // TODO: This -1 +1 nonsense is a hack that fixes an issue where startAt() only returns a
+        // single item with that planDateMillis value, rather than all items with that value. Fix.
+        Query plannedRecipeQueryRef = rootRef.child(PLANNED_RECIPE_REF)
+                .orderByChild("planDateMillis")
+                .startAt(startDate.getMillis() - 1).endAt(endDate.getMillis() + 1);
         plannedRecipeQueryRef.addListenerForSingleValueEvent(new DefaultValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

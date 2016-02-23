@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">YumNote</string>
     <string name="action_create_recipe">Create recipe</string>
+    <string name="action_save">Save</string>
     <string name="action_settings">Settings</string>
 
     <string-array name="days_of_week">
@@ -18,7 +19,8 @@
         <item>Lunch</item>
         <item>Dinner</item>
     </string-array>
-    <string name="title_activity_choose_meal">ChooseMealActivity</string>
+    <string name="title_activity_choose_meal">Choose a recipe</string>
     <string name="title_activity_main">YumNote</string>
+    <string name="title_activity_create_recipe">Create a new recipe</string>
 
 </resources>
