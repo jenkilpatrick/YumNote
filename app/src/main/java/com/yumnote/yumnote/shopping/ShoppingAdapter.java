@@ -3,6 +3,7 @@ package com.yumnote.yumnote.shopping;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -129,6 +130,7 @@ public class ShoppingAdapter extends RecyclerView.Adapter<ShoppingAdapter.ViewHo
         ref.addValueEventListener(new DefaultValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "Received new shopping lists: " + dataSnapshot.getChildrenCount());
                 shoppingLists.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     ShoppingList shoppingList = snapshot.getValue(ShoppingList.class);

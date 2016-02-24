@@ -12,10 +12,15 @@ import com.firebase.client.Transaction.Handler;
 import com.firebase.client.Transaction.Result;
 import com.yumnote.yumnote.model.ShoppingList.ShoppingListIngredient;
 
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
 /**
  * Created by jen on 2/17/16.
  */
 public class Store {
+    private static final String TAG = "Store";
+
     public static final String FIREBASE_ROOT_REF = "https://popping-heat-7515.firebaseio.com/";
     public static final String RECIPE_REF = "recipe";
     public static final String PLANNED_RECIPE_REF = "planned_recipe";
@@ -37,7 +42,7 @@ public class Store {
         plannedRecipe.setRecipeTitle(recipeTitle);
         plannedRecipe.setNumServings(recipeNumServings);
 
-        Firebase plannedRecipeRef = new Firebase(FIREBASE_ROOT_REF + PLANNED_RECIPE_REF);
+        Firebase plannedRecipeRef = new Firebase(FIREBASE_ROOT_REF).child(PLANNED_RECIPE_REF);
         Firebase newRef = plannedRecipeRef.push();
         newRef.setValue(plannedRecipe);
         plannedRecipe.setKey(newRef.getKey());
@@ -65,45 +70,57 @@ public class Store {
         Log.e("Store", "Start millis: " + startDate.getMillis() + " " + "End millis: "
                 + endDate.getMillis());
 
-        // TODO: This -1 +1 nonsense is a hack that fixes an issue where startAt() only returns a
-        // single item with that planDateMillis value, rather than all items with that value. Fix.
+        // TODO: Constraining by endAt() seems to exclude the wrong items from the query. Is it a
+        // bug?
         Query plannedRecipeQueryRef = rootRef.child(PLANNED_RECIPE_REF)
                 .orderByChild("planDateMillis")
-                .startAt(startDate.getMillis() - 1).endAt(endDate.getMillis() + 1);
+                .startAt(startDate.getMillis());
         plannedRecipeQueryRef.addListenerForSingleValueEvent(new DefaultValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.e(TAG, "Num planned recipes received: " + dataSnapshot.getChildrenCount());
+                CountDownLatch latch = new CountDownLatch((int) dataSnapshot.getChildrenCount());
                 for (DataSnapshot prSnapshot : dataSnapshot.getChildren()) {
                     PlannedRecipe plannedRecipe = prSnapshot.getValue(PlannedRecipe.class);
-                    String plannedRecipeKey = prSnapshot.getKey();
-                    addIngredientsToShoppingList(
-                            shoppingList.getKey(), plannedRecipe.getRecipeKey(), plannedRecipeKey,
-                            plannedRecipe.getRecipeTitle());
+                    plannedRecipe.setKey(prSnapshot.getKey());
+                    addIngredientsToShoppingList(shoppingList.getKey(), plannedRecipe, latch);
                 }
             }
         });
     }
 
-    private void addIngredientsToShoppingList(String shoppingListKey, String recipeKey,
-            final String plannedRecipeKey, final String plannedRecipeTitle) {
+    private void addIngredientsToShoppingList(String shoppingListKey,
+            final PlannedRecipe plannedRecipe, final CountDownLatch recipeLatch) {
         Firebase rootRef = new Firebase(FIREBASE_ROOT_REF);
-        Firebase recipeRef = rootRef.child(RECIPE_REF).child(recipeKey);
+        Firebase recipeRef = rootRef.child(RECIPE_REF).child(plannedRecipe.getRecipeKey());
         final Firebase shoppingListRef = rootRef.child(SHOPPING_LIST_REF).child(shoppingListKey);
 
         recipeRef.addListenerForSingleValueEvent(new DefaultValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot recipeSnapshot) {
+                        Log.d(TAG, String.format("Recipe %s received for plannedRecipe %s",
+                                plannedRecipe.getRecipeKey(), plannedRecipe.getKey()));
+
+                        // TODO: Make this creation and key setting a method on Recipe class to
+                        // avoid omitting setting the key elsewhere.
                         Recipe recipe = recipeSnapshot.getValue(Recipe.class);
-                        if (recipe.getIngredients() != null) {
-                            for (final Ingredient ingredient : recipe.getIngredients()) {
+                        recipe.setKey(recipeSnapshot.getKey());
+
+                        List<Ingredient> ingredientList =
+                                recipe.getIngredientsForServingSize(plannedRecipe.getNumServings());
+
+                        if (ingredientList != null) {
+                            final CountDownLatch ingredientLatch =
+                                    new CountDownLatch(ingredientList.size());
+                            for (final Ingredient ingredient : ingredientList) {
                                 shoppingListRef.runTransaction(new Handler() {
                                     @Override
                                     public Result doTransaction(MutableData currentData) {
                                         ShoppingList shoppingList =
                                                 currentData.getValue(ShoppingList.class);
                                         shoppingList.addIngredient(new ShoppingListIngredient(
-                                                ingredient, false, plannedRecipeKey,
-                                                plannedRecipeTitle));
+                                                ingredient, false, plannedRecipe.getKey(),
+                                                plannedRecipe.getRecipeTitle()));
                                         currentData.setValue(shoppingList);
                                         return Transaction.success(currentData);
                                     }
@@ -111,7 +128,16 @@ public class Store {
                                     @Override
                                     public void onComplete(FirebaseError firebaseError, boolean b,
                                                            DataSnapshot dataSnapshot) {
-                                        // Ignore
+                                        ingredientLatch.countDown();
+                                        Log.d(TAG, "Ingredient creation is complete");
+                                        if (ingredientLatch.getCount() == 0) {
+                                            Log.d(TAG, "Recipe creation is complete");
+                                            recipeLatch.countDown();
+                                            if (recipeLatch.getCount() == 0) {
+                                                // TODO: Remove progress bar.
+                                                Log.d(TAG, "Shopping list creation is complete");
+                                            }
+                                        }
                                     }
                                 });
                             }

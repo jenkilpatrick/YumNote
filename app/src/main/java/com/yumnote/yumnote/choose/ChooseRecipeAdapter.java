@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.NumberPicker;
+import android.widget.NumberPicker.OnValueChangeListener;
 import android.widget.TextView;
 
 import com.yumnote.yumnote.R;
@@ -17,7 +19,8 @@ import com.yumnote.yumnote.model.RecipeQuery;
  */
 public class ChooseRecipeAdapter extends RecyclerView.Adapter<ChooseRecipeAdapter.ViewHolder> {
     public interface RecipeSelectionListener {
-        void onRecipeSelected(Recipe recipe);
+        void onRecipeSelected(Recipe recipe, int numServings);
+        void onNumServingsUpdated(int numServings);
         void onSelectionRemoved();
     }
 
@@ -29,6 +32,8 @@ public class ChooseRecipeAdapter extends RecyclerView.Adapter<ChooseRecipeAdapte
     public class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         private CardView cardView;
+        private View servingsChooserView;
+        private NumberPicker servingsPicker;
 
         public ViewHolder(CardView v) {
             super(v);
@@ -37,10 +42,6 @@ public class ChooseRecipeAdapter extends RecyclerView.Adapter<ChooseRecipeAdapte
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: When an item is selected, hide the FAB button and show a "select"
-                    // button that will close the activity and return the recipe key to the previous
-                    // activity.
-
                     if (selectedItem == getLayoutPosition()) {
                         selectedItem = -1;
                         notifyItemChanged(getLayoutPosition());
@@ -50,8 +51,20 @@ public class ChooseRecipeAdapter extends RecyclerView.Adapter<ChooseRecipeAdapte
                         selectedItem = getLayoutPosition();
                         notifyItemChanged(selectedItem);
                         recipeSelectionListener.onRecipeSelected(
-                                recipeQuery.getRecipes().get(getLayoutPosition()));
+                                recipeQuery.getRecipes().get(getLayoutPosition()),
+                                servingsPicker.getValue());
                     }
+                }
+            });
+            servingsChooserView = cardView.findViewById(R.id.servings_chooser);
+            servingsPicker =
+                    (NumberPicker) servingsChooserView.findViewById(R.id.num_servings_picker);
+            servingsPicker.setMinValue(1);
+            servingsPicker.setMaxValue(50);
+            servingsPicker.setOnValueChangedListener(new OnValueChangeListener() {
+                @Override
+                public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                    recipeSelectionListener.onNumServingsUpdated(newVal);
                 }
             });
         }
@@ -59,6 +72,12 @@ public class ChooseRecipeAdapter extends RecyclerView.Adapter<ChooseRecipeAdapte
         public void setRecipe(Recipe recipe) {
             TextView recipeNameView = (TextView) cardView.findViewById(R.id.recipe_name);
             recipeNameView.setText(recipe.getName());
+            servingsPicker.setValue(recipe.getMinNumServed());
+        }
+
+        public void setSelectionState(boolean selected) {
+            cardView.setSelected(selected);
+            servingsChooserView.setVisibility(selected ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -82,7 +101,7 @@ public class ChooseRecipeAdapter extends RecyclerView.Adapter<ChooseRecipeAdapte
     @Override
     public ChooseRecipeAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         CardView v = (CardView) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.recipe_card, parent, false);
+                .inflate(R.layout.choose_recipe_card, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }
@@ -91,12 +110,12 @@ public class ChooseRecipeAdapter extends RecyclerView.Adapter<ChooseRecipeAdapte
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.setRecipe(recipeQuery.getRecipes().get(position));
-        holder.cardView.setSelected(selectedItem == position);
+        holder.setSelectionState(selectedItem == position);
 
         // TODO: Setting the selected color this way destroys the tap animation, and the gray is too
         // dark. Fix it.
         holder.cardView.setCardBackgroundColor(
-                selectedItem == position ? Color.LTGRAY : Color.WHITE);
+                selectedItem == position ? Color.parseColor("#eeeeee") : Color.WHITE);
     }
 
     // Return the size of your dataset (invoked by the layout manager)

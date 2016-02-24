@@ -7,7 +7,7 @@ import java.util.Objects;
  */
 public class Ingredient {
     // e.g., 2
-    private int value;
+    private double value;
 
     // TODO: denormalize singular/plural
     // e.g., cups
@@ -19,17 +19,17 @@ public class Ingredient {
 
     public Ingredient() { }
 
-    public Ingredient(int value, String measure, String item) {
+    public Ingredient(double value, String measure, String item) {
         this.value = value;
         this.measure = measure;
         this.item = item;
     }
 
-    public void setValue(int value) {
+    public void setValue(double value) {
         this.value = value;
     }
 
-    public int getValue() {
+    public double getValue() {
         return value;
     }
 

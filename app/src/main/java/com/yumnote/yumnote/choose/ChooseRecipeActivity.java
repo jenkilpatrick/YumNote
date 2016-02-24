@@ -16,7 +16,7 @@ import com.yumnote.yumnote.model.Recipe;
 import com.yumnote.yumnote.planner.PlannerFragment;
 
 public class ChooseRecipeActivity extends AppCompatActivity
-        implements ChooseRecipeAdapter.RecipeSelectionListener{
+        implements ChooseRecipeAdapter.RecipeSelectionListener {
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
@@ -24,6 +24,7 @@ public class ChooseRecipeActivity extends AppCompatActivity
 
     private String selectedRecipeId;
     private String selectedRecipeTitle;
+    private int selectedRecipeNumServings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +50,8 @@ public class ChooseRecipeActivity extends AppCompatActivity
                 Intent intent = new Intent();
                 intent.putExtra(PlannerFragment.EXTRA_RECIPE_KEY, selectedRecipeId);
                 intent.putExtra(PlannerFragment.EXTRA_RECIPE_TITLE, selectedRecipeTitle);
-
-                // TODO: Add ability to select number of servings
-                intent.putExtra(PlannerFragment.EXTRA_RECIPE_NUM_SERVINGS, 3);
-
+                intent.putExtra(
+                        PlannerFragment.EXTRA_RECIPE_NUM_SERVINGS, selectedRecipeNumServings);
                 setResult(Activity.RESULT_OK, intent);
                 finish();
             }
@@ -70,9 +69,10 @@ public class ChooseRecipeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onRecipeSelected(Recipe recipe) {
+    public void onRecipeSelected(Recipe recipe, int numServings) {
         selectedRecipeId = recipe.getKey();
         selectedRecipeTitle = recipe.getName();
+        selectedRecipeNumServings = numServings;
 
         ((FloatingActionButton) findViewById(R.id.fab)).hide();
         // TODO: Animate button in
@@ -80,9 +80,15 @@ public class ChooseRecipeActivity extends AppCompatActivity
     }
 
     @Override
+    public void onNumServingsUpdated(int numServings) {
+        selectedRecipeNumServings = numServings;
+    }
+
+    @Override
     public void onSelectionRemoved() {
         selectedRecipeId = null;
         selectedRecipeTitle = null;
+        selectedRecipeNumServings = 0;
 
         // TODO: Animate button out
         findViewById(R.id.button_select).setVisibility(View.GONE);
